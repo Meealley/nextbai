@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324237585263",
+    "project_id": "nextbai",
+    "storage_bucket": "nextbai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324237585263:android:e9359fd2c3d463ffe5969a",
+        "android_client_info": {
+          "package_name": "com.example.nextbai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBv5ydqDT9R1mKxYjcoV71vNuN9cFMqHgA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
