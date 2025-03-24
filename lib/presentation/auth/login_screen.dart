@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
   bool _loadWithProgress = false;
   bool _rememberMe = false;
+  bool _isAuthenticating = false;
 
   @override
   void initState() {
@@ -83,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       form.save();
 
-      _loadWithProgress = !_loadWithProgress;
+      _loadWithProgress = true;
       log("email: $_email, password: $_password");
 
       context.read<LoginCubit>().logIn(
@@ -91,6 +92,20 @@ class _LoginScreenState extends State<LoginScreen> {
             password: _password!,
           );
     });
+  }
+
+  void _logInWithGoogle() {
+    setState(() {
+      _isAuthenticating = true;
+    });
+    context.read<LoginCubit>().loginWithGoogle();
+  }
+
+  void _logInWithApple() {
+    setState(() {
+      _isAuthenticating = true;
+    });
+    context.read<LoginCubit>().signInWithApple();
   }
 
   @override
@@ -101,12 +116,18 @@ class _LoginScreenState extends State<LoginScreen> {
           await _saveCredentials();
           context.go(Pages.homeScreen);
         } else if (state.logInStatus == LogInStatus.failure) {
+          log("Login failed: ${state.error.message}");
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text("Login failed"),
               backgroundColor: AppColors.background,
             ),
           );
+
+          setState(() {
+            _loadWithProgress = false;
+            _isAuthenticating = false;
+          });
         }
       },
       child: GestureDetector(
@@ -288,33 +309,44 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    CircleAvatar(
-                                      backgroundColor: AppColors.grey,
-                                      radius: 3.h,
+                                    GestureDetector(
+                                      onTap: _isAuthenticating
+                                          ? null
+                                          : _logInWithApple,
                                       child: CircleAvatar(
-                                        radius: 3.h - 1,
-                                        backgroundColor: AppColors.white,
-                                        child: Center(
-                                          child: SvgPicture.asset(
-                                            "assets/images/Apple.svg",
-                                            width: 36, // Adjust size as needed
-                                            height: 36,
+                                        backgroundColor: AppColors.grey,
+                                        radius: 3.h,
+                                        child: CircleAvatar(
+                                          radius: 3.h - 1,
+                                          backgroundColor: AppColors.white,
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              "assets/images/Apple.svg",
+                                              width:
+                                                  36, // Adjust size as needed
+                                              height: 36,
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                     SizedBox(
                                         width: 16), // Add spacing between icons
-                                    CircleAvatar(
-                                      radius: 3.h,
-                                      backgroundColor: AppColors.grey,
+                                    GestureDetector(
+                                      onTap: _isAuthenticating
+                                          ? null
+                                          : _logInWithGoogle,
                                       child: CircleAvatar(
-                                        radius: 3.h - 1,
-                                        backgroundColor: AppColors.white,
-                                        child: SvgPicture.asset(
-                                          "assets/images/google_icon.svg",
-                                          width: 36, // Adjust size as needed
-                                          height: 36,
+                                        radius: 3.h,
+                                        backgroundColor: AppColors.grey,
+                                        child: CircleAvatar(
+                                          radius: 3.h - 1,
+                                          backgroundColor: AppColors.white,
+                                          child: SvgPicture.asset(
+                                            "assets/images/google_icon.svg",
+                                            width: 36, // Adjust size as needed
+                                            height: 36,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -350,6 +382,32 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+              // Loading overlay for social auth
+              if (_isAuthenticating)
+                Container(
+                  color: Colors.black.withOpacity(0.5),
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator.adaptive(
+                            // color: AppColors.background,
+                            ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          "Authenticating...",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

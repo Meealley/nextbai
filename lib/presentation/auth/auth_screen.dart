@@ -410,9 +410,9 @@ class _AuthScreenState extends State<AuthScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircularProgressIndicator(
-                            color: AppColors.background,
-                          ),
+                          CircularProgressIndicator.adaptive(
+                              // color: AppColors.background,
+                              ),
                           SizedBox(height: 2.h),
                           Text(
                             "Authenticating...",

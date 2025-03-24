@@ -47,6 +47,54 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
+  // Google Sign-In
+  Future<void> loginWithGoogle() async {
+    emit(state.copyWith(logInStatus: LogInStatus.loading));
+
+    try {
+      final user = await _authRepository.signInWithGoogle();
+      log("Google Sign-In success: $user");
+      emit(state.copyWith(logInStatus: LogInStatus.success));
+    } catch (e) {
+      log("Google Sign-In failed: $e");
+      emit(state.copyWith(
+          logInStatus: LogInStatus.failure,
+          error: CustomError(message: 'Google Sign-In failed')));
+    }
+  }
+
+// Sign In with Apple
+  Future<void> signInWithApple() async {
+    emit(state.copyWith(logInStatus: LogInStatus.loading));
+
+    try {
+      final user = await _authRepository.signInWithApple();
+      log("Apple sign-in success: ${user.email}");
+
+      emit(
+        state.copyWith(
+          logInStatus: LogInStatus.success,
+        ),
+      );
+    } on NetworkException {
+      emit(state.copyWith(
+        logInStatus: LogInStatus.failure,
+        error: CustomError(message: 'Network error'),
+      ));
+    } on GenericAuthException {
+      emit(state.copyWith(
+        logInStatus: LogInStatus.failure,
+        error: CustomError(message: 'Apple sign-in failed'),
+      ));
+    } catch (e) {
+      log("Apple Sign-in Error: $e");
+      emit(state.copyWith(
+        logInStatus: LogInStatus.failure,
+        error: CustomError(message: 'An unexpected error occurred'),
+      ));
+    }
+  }
+
   // Sign out
   Future<void> signOut() async {
     emit(state.copyWith(logInStatus: LogInStatus.loading));
